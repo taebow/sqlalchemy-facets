@@ -1,5 +1,10 @@
 language: python
 
+python:
+  - 3.8
+  - 3.7
+  - 3.6
+
 stages:
   - test
 
@@ -10,8 +15,6 @@ cache:
 
 jobs:
   fast_finish: true
-  include:
-    - python: 3.8
 
 env:
   - DOCKER_COMPOSE_VERSION=1.25.4
