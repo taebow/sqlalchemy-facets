@@ -1,5 +1,9 @@
+=================
 SQLAlchemy-Facets
 =================
+
+.. image:: https://travis-ci.org/tteaka/sqlalchemy-facets.svg?branch=master
+   :target: https://travis-ci.org/tteaka/sqlalchemy-facets
 
 SQLAlchemy-Facets is an utility based on `SQLAlchemy`_ that aims to provide
 easy-to-use and efficient helpers to build category based filters and do search
