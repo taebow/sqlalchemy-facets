@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "sqlalchemy-facets"
+version = "0.1.0"
+description = ""
+authors = ["Thibaut Frain <thibaut.frain@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+sqlalchemy = "^1.3.13"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+pytest-cov = "^2.8.1"
+factory-boy = "^2.12.0"
+psycopg2-binary = "^2.8.4"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

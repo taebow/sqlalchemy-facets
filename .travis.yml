@@ -8,6 +8,11 @@ cache:
   directories:
     - $HOME/.cache/pypoetry
 
+jobs:
+  fast_finish: true
+  include:
+    - python: 3.8
+
 install:
   - pip install pip -U
   - curl -fsS -o get-poetry.py https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
