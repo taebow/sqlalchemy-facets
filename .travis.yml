@@ -13,19 +13,14 @@ python:
 env:
   - PG_TAG=latest SQLA=1.3.13
   - PG_TAG=latest SQLA=1.2.19
-  - PG_TAG=latest SQLA=1.1.18
   - PG_TAG=12.2 SQLA=1.3.13
   - PG_TAG=12.2 SQLA=1.2.19
-  - PG_TAG=12.2 SQLA=1.1.18
   - PG_TAG=11.7 SQLA=1.3.13
   - PG_TAG=11.7 SQLA=1.2.19
-  - PG_TAG=11.7 SQLA=1.1.18
   - PG_TAG=10.12 SQLA=1.3.13
   - PG_TAG=10.12 SQLA=1.2.19
-  - PG_TAG=10.12 SQLA=1.1.18
   - PG_TAG=9.6 SQLA=1.3.13
   - PG_TAG=9.6 SQLA=1.2.19
-  - PG_TAG=9.6 SQLA=1.1.18
 
 install:
   - pip install pip -U
