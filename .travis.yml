@@ -24,6 +24,7 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+  - pip install codecov
 
 install:
   - docker-compose up -d
@@ -35,3 +36,6 @@ install:
   - poetry build -v
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
+
+after_success:
+  - codecov
