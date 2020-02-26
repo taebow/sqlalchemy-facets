@@ -34,12 +34,11 @@ install:
 before_script: docker-compose up -d && sleep 3
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
-after_success:
-  - codecov
-
 jobs:
   fast_finish: true
   include:
+    - stage: codecov
+      script: poetry run pytest --cov=sqlalchemy_facets tests/ && codecov
     - stage: publish
       script: skip
       deploy:
