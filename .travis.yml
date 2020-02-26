@@ -15,6 +15,12 @@ cache:
 
 jobs:
   fast_finish: true
+  include:
+    - stage: coverage
+      script: codecov
+    - stage: deploy
+      script: poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
+
 
 env:
   - DOCKER_COMPOSE_VERSION=1.25.4
