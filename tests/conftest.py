@@ -25,11 +25,11 @@ def seeds(request):
 
 
 FACETS = [
-    # [],
-    # [FacetOne],
-    # [FacetTwo],
-    # [FacetThree],
-    # [FacetOne, FacetTwo, FacetThree],
+    [],
+    [FacetOne],
+    [FacetTwo],
+    [FacetThree],
+    [FacetOne, FacetTwo, FacetThree],
     ["str_attribute_two"]
 ]
 
@@ -38,19 +38,19 @@ SUBQUERY = session.query(SimpleModelOne)\
 
 
 QUERIES = [
-    # session.query(SimpleModelOne),
-    # session.query(SimpleModelOne).filter(SimpleModelOne.int_attribute > 500),
-    # session.query(SimpleModelOne).filter(SimpleModelOne.str_attribute_one.in_(["abc", "def"])),
-    # session.query(SimpleModelOne.id, SimpleModelOne.str_attribute_one,
-    #               SimpleModelOne.str_attribute_two, SimpleModelOne.int_attribute),
-    # session.query(SUBQUERY.subquery()),
-    # session.query(SUBQUERY.cte()),
+    session.query(SimpleModelOne),
+    session.query(SimpleModelOne).filter(SimpleModelOne.int_attribute > 500),
+    session.query(SimpleModelOne).filter(SimpleModelOne.str_attribute_one.in_(["abc", "def"])),
+    session.query(SimpleModelOne.id, SimpleModelOne.str_attribute_one,
+                  SimpleModelOne.str_attribute_two, SimpleModelOne.int_attribute),
+    session.query(SUBQUERY.subquery()),
+    session.query(SUBQUERY.cte()),
     session.query(SimpleModelOne).join(SimpleModelTwo)
 ]
 
 SEEDS = [
-    # (SimpleFactoryOne, 0),
-    # (SimpleFactoryOne, 1),
-    # (SimpleFactoryOne, 23),
+    (SimpleFactoryOne, 0),
+    (SimpleFactoryOne, 1),
+    (SimpleFactoryOne, 23),
     (SimpleFactoryOne, 100)
 ]
