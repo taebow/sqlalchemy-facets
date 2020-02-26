@@ -10,39 +10,28 @@ cache:
   directories:
     - $HOME/.cache/pypoetry
 
-#jobs:
-#  fast_finish: true
-#  include:
-#    - stage: build & deploy
-#      script: poetry build
-#      deploy:
-#        provider: pypi
-#        username: $PYPI_USER
-#        password: $PYPI_PASSWD
-#        github_token: $GITHUB_TOKEN
-#        skip_existing: true
-#        on:
-#          branch: master
-
 env:
   - DOCKER_COMPOSE_VERSION=1.25.4
 
-before_install:
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-  - pip install codecov
-
 install:
-  - docker-compose up -d
   - pip install pip -U
   - curl -fsS -o get-poetry.py https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
   - python get-poetry.py --preview -y
   - source $HOME/.poetry/env
+  - pip install codecov
+
+before_script:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+  - docker-compose up -d
   - poetry install -v
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
-after_success:
-  - codecov
+jobs:
+  fast_finish: true
+  include:
+    - stage: codecov
+      script: codecov
