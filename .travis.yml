@@ -37,7 +37,10 @@ jobs:
   fast_finish: true
   include:
     - stage: publish
-      script: poetry publish --build -u $PYPI_USER -p $PYPI_PASSWD
-      on:
-        branch: master
-        tags: true
+      script: skip
+      deploy:
+        - provider: script
+          script: poetry publish --build -u $PYPI_USER -p $PYPI_PASSWD
+          on:
+            branch: master
+            tags: true
