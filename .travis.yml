@@ -16,6 +16,7 @@ jobs:
     - stage: deploy
       script:
         - poetry version patch
+        - poetry build -v
         - poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
         - git add pyproject.toml
         - git commit -m "[ci skip] update version ${poetry version | cut -d ' ' -f2}"
@@ -44,7 +45,7 @@ install:
   - python get-poetry.py --preview -y
   - source $HOME/.poetry/env
   - poetry install -v
-  - poetry build -v
+
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
