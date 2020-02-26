@@ -16,6 +16,8 @@ env:
   - PG_VERSION=11.7
   - PG_VERSION=10.12
   - PG_VERSION=9.6
+  - SQLA_VERSION=1
+  - SQLA_VERSION=1.3.2
 
 install:
   - pip install pip -U
@@ -23,6 +25,7 @@ install:
   - python get-poetry.py --preview -y
   - source $HOME/.poetry/env
   - pip install codecov
+  - poetry add "sqlalchemy==$SQLA_VERSION"
   - poetry install -v
 
 before_script: docker-compose up -d && sleep 3
