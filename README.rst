@@ -91,7 +91,7 @@ Filter
 Links
 -----
 
--   Code: https://github.com/thibautfrain/sqlalchemy-facets
+-   Code: https://github.com/tteaka/sqlalchemy-facets
 
 .. _SQLAlchemy: https://www.sqlalchemy.org
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
