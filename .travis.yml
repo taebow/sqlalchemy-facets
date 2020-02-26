@@ -42,7 +42,3 @@ install:
   - poetry build -v
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
-
-after_success:
-  - codecov
-  - poetry publish
