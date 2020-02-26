@@ -30,10 +30,14 @@ before_script:
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
+after_success:
+  - codecov
 
 jobs:
   fast_finish: true
   include:
-    - stage: test
-      python: 3.8
-      script: codecov
+    - stage: publish
+      script: poetry publish --build -u $PYPI_USER -p $PYPI_PASSWD
+      on:
+        branch: master
+        tags: true
