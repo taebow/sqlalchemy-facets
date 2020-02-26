@@ -5,9 +5,6 @@ python:
   - 3.7
   - 3.6
 
-stages:
-  - test
-
 cache:
   pip: true
   directories:
@@ -17,8 +14,18 @@ jobs:
   fast_finish: true
   include:
     - stage: deploy
-      script: poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
+      script:
+        - poetry version patch
+        - poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
+        - git add pyproject.toml
+        - git commit -m "[ci skip] update version ${poetry version | cut -d ' ' -f2}"
+        - git push origin master
 
+
+stages:
+  - test
+  - name: deploy
+    if: branch = master
 
 env:
   - DOCKER_COMPOSE_VERSION=1.25.4
