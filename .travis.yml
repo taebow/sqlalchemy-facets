@@ -11,7 +11,11 @@ cache:
     - $HOME/.cache/pypoetry
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.25.4
+  - PG_VERSION=latest
+  - PG_VERSION=12.2
+  - PG_VERSION=11.7
+  - PG_VERSION=10.12
+  - PG_VERSION=9.6
 
 install:
   - pip install pip -U
