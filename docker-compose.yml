@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
  db:
-  image: postgres:${PG_VERSION}
+  image: postgres:${PG_TAG}
   environment:
    POSTGRES_PASSWORD: test
    POSTGRES_USER: test
