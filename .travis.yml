@@ -25,7 +25,7 @@ install:
   - pip install codecov
   - poetry install -v
 
-before_script: docker-compose up -d
+before_script: docker-compose up -d && sleep 3
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
 after_success:
