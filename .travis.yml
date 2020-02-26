@@ -30,8 +30,10 @@ before_script:
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
 
-jobs:
-  fast_finish: true
-  include:
-    - stage: codecov
-      script: codecov
+after_success:
+  - codecov
+#jobs:
+#  fast_finish: true
+#  include:
+#    - stage: codecov
+#      script: codecov
