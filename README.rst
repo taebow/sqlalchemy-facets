@@ -91,12 +91,7 @@ Filter
 Links
 -----
 
--   Documentation: https://flask-sqlalchemy.palletsprojects.com/
--   Releases: https://pypi.org/project/Flask-SQLAlchemy/
 -   Code: https://github.com/thibautfrain/sqlalchemy-facets
--   Issue tracker: https://github.com/pallets/flask-sqlalchemy/issues
--   Test status: https://travis-ci.org/pallets/flask-sqlalchemy
--   Test coverage: https://codecov.io/gh/pallets/flask-sqlalchemy
 
 .. _SQLAlchemy: https://www.sqlalchemy.org
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
