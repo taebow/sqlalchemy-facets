@@ -14,7 +14,7 @@ jobs:
     - python: 3.8
 
 env:
-  - DOCKER_COMPOSE_VERSION=1.4.2
+  - DOCKER_COMPOSE_VERSION=1.25.4
 
 before_install:
   - sudo rm /usr/local/bin/docker-compose
