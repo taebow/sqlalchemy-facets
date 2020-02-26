@@ -16,8 +16,6 @@ cache:
 jobs:
   fast_finish: true
   include:
-    - stage: coverage
-      script: codecov
     - stage: deploy
       script: poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
 
@@ -42,3 +40,6 @@ install:
   - poetry build -v
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
+
+after_success:
+  - codecov
