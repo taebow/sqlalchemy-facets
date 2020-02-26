@@ -6,3 +6,4 @@ venv/
 .coverage
 */.coverage
 docs/_build
+poetry.lock
