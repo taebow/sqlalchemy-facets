@@ -17,6 +17,7 @@ jobs:
       script: poetry version patch
       deploy:
         provider: pages
+        target_branch: master
         skip_cleanup: true
         github_token: $GITHUB_TOKEN
         keep_history: true
