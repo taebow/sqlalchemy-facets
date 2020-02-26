@@ -14,14 +14,23 @@ jobs:
   fast_finish: true
   include:
     - stage: deploy
-      script:
-        - poetry version patch
-        - poetry build -v
-        - poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
-        - git remote add origin https://${GITHUB_TOKEN}@github.com/tteaka/sqlalchemy-facets.git
-        - git add pyproject.toml
-        - git commit -m "[ci skip] update version $(poetry version | cut -d ' ' -f2)"
-        - git push origin master
+      script: poetry version patch
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep_history: true
+        on:
+          branch: master
+
+#      script:
+#        - poetry version patch
+#        - poetry build -v
+#        - poetry publish -u ${PYPI_USER} -p ${PYPI_PASSWD}
+#        - git remote add origin https://${GITHUB_TOKEN}@github.com/tteaka/sqlalchemy-facets.git
+#        - git add pyproject.toml
+#        - git commit -m "[ci skip] update version $(poetry version | cut -d ' ' -f2)"
+#        - git push origin master
 
 
 stages:

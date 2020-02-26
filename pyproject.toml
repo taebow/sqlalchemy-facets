@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sqlalchemy-facets"
-version = "0.1.0"
+version = "0.1.2"
 description = "Faceted search for SQLAlchemy"
 authors = ["Thibaut Frain <thibaut.frain@gmail.com>"]
 
