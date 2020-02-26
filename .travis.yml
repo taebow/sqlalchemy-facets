@@ -23,12 +23,12 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 install:
+  - docker-compose up -d
   - pip install pip -U
   - curl -fsS -o get-poetry.py https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py
   - python get-poetry.py --preview -y
   - source $HOME/.poetry/env
   - poetry install -v
   - poetry build -v
-  - docker-compose up -d
 
 script: poetry run pytest --cov=sqlalchemy_facets tests/
