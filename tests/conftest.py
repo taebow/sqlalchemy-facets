@@ -25,7 +25,7 @@ def seeds(request):
 
 
 FACETS = [
-    [],
+    {""}
     [FacetOne],
     [FacetTwo],
     [FacetThree],
