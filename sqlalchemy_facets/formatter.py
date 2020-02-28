@@ -33,4 +33,3 @@ class FacetResult:
 
     def asdict(self) -> dict:
         return {"buckets": [v._asdict() for v in self.values_count]}
-

@@ -1,4 +1,3 @@
-import typing
 from typing import Dict, Sequence, Any, Union
 from collections import OrderedDict
 
@@ -21,8 +20,9 @@ class Mapper:
 
 
 class Facet:
-
-    def __init__(self, name: str = None, column_name: str = None, mapper: Mapper = Mapper()):
+    def __init__(
+        self, name: str = None, column_name: str = None, mapper: Mapper = Mapper()
+    ):
         self.name = name
         self.mapper = mapper
         self.column_name = column_name or name
@@ -33,14 +33,13 @@ class Facet:
     def facet_column(self, base: Selectable) -> Label:
         return self._labeled_column(base)
 
-    def filter(self, query: Query, filter_config: Sequence) -> BinaryExpression:
-        return get_column(query, self.column_name)\
-            .in_([self.mapper.revert(v) for v in filter_config["values"]])
+    def filter(self, query: Query, filter_config: Dict[str, Any]) -> BinaryExpression:
+        return get_column(query, self.column_name).in_(
+            [self.mapper.revert(v) for v in filter_config["values"]]
+        )
 
 
-def build_facets(
-        facets: Union[Dict[str, dict], Sequence[str]]
-) -> typing.OrderedDict[str, Facet]:
+def build_facets(facets: Union[Dict[str, dict], Sequence[str]]) -> OrderedDict:
 
     if isinstance(facets, list):
         return OrderedDict((name, Facet(name)) for name in facets)

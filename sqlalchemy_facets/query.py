@@ -1,15 +1,15 @@
-from typing import List, Tuple, Dict, OrderedDict
+from typing import List, Tuple, Dict
+from collections import OrderedDict
 
 from sqlalchemy import func, distinct
 from sqlalchemy.orm import Query
 
-from .facet import Facet
 from .formatter import FacetResult
 from .utils import get_column, get_primary_key
 
 
 class QueryBuilder:
-    def __init__(self, query: Query, facets: OrderedDict[str, Facet]):
+    def __init__(self, query: Query, facets: OrderedDict):
         self.base = query.subquery()
         self.session = query.session
         self.facets = facets
@@ -32,9 +32,7 @@ class QueryBuilder:
 
         return {
             facet.name: FacetResult.from_dual_sequences(
-                facet=facet,
-                values=raw_facets[i],
-                counts=raw_facets[-1]
+                facet=facet, values=raw_facets[i], counts=raw_facets[-1]
             ).asdict()
             for i, facet in enumerate(self.facets.values())
         }
