@@ -84,13 +84,15 @@ Result
 Filter
 ~~~~~~
 
+Let's query (french OR spanish) AND (action OR comedy) movies !
+
 .. code-block:: python
 
     >>> selection = [
-    >>>     {"genre": {"values": ["action", "comedy"]}},
-    >>>     {"language": {"values" ["Spanish", "French"]}}
+    >>>     {"genre":    {"values": ["action",  "comedy" ]}},
+    >>>     {"language": {"values": ["Spanish", "French"]}}
     >>> ]
-    >>> print("Let's query French or Spanish, action or comedy movies !")
+    >>>
     >>> f.apply_filter(all_movies, selection).all()
 
 
