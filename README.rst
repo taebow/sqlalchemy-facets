@@ -9,6 +9,8 @@ SQLAlchemy-Facets is an utility based on `SQLAlchemy`_ that aims to provide
 easy-to-use and efficient helpers to build category based filters and do search
 with multiple criterias.
 
+Its purpose is to be similar to ElasticSearch's feature `terms aggregation`_.
+
 .. image:: https://i.ibb.co/ZLHxGDv/work-in-progress.png
    :width: 100pt
 
@@ -103,3 +105,4 @@ Links
 
 .. _SQLAlchemy: https://www.sqlalchemy.org
 .. _pip: https://pip.pypa.io/en/stable/quickstart/
+.. _terms aggregation: https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html
