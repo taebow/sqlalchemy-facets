@@ -9,8 +9,8 @@ SQLAlchemy-Facets is an utility based on `SQLAlchemy`_ that aims to provide
 easy-to-use and efficient helpers to build category based filters and do search
 with multiple criterias.
 
-.. warning::
-  work in progress
+.. image:: https://ibb.co/dWbDjYX
+   :width: 40pt
 
 
 Installing
@@ -44,7 +44,7 @@ Configuration
 
     from sqlalchemy_facets import declare_facets
 
-    facets = declare_facets("genre", "language")
+    f = declare_facets("genre", "language")
 
 Querying
 ~~~~~~~~
@@ -54,7 +54,7 @@ Querying
     all_movies = session.query(Movie)
 
     # Facets query
-    facets_result = facets.from_query(all_movies).all()
+    facets = f.get_facets(all_movies)
 
 
 Result
@@ -62,19 +62,21 @@ Result
 
 .. code-block:: python
 
-    >>> pprint(facets_result)
+    >>> pprint(facets)
     {
-        "name": "genre",
-        "values": {
-            "value": "horror", "count": 23,
-            "value": "action", "count": 52,
-            "value": "comedy", "count": 34
+        "genre" {
+            "buckets": [
+                {"value": "horror", "count": 23},
+                {"value": "action", "count": 52},
+                {"value": "comedy", "count": 34}
+            ]
         },
-        "name": "language",
-        "values": {
-            "value": "English", "count": 75,
-            "value": "Spanish", "count": 12,
-            "value": "French", "count" 23
+        "language": {
+            "buckets": [
+                {"value": "English", "count": 75},
+                {"value": "Spanish", "count": 12},
+                {"value": "French", "count" 23}
+            ]
         }
     }
 
@@ -85,11 +87,11 @@ Filter
 .. code-block:: python
 
     >>> selection = [
-    >>>     {"name": "genre", "values": ["action", "comedy"]},
-    >>>     {"name": "language", "values" ["Spanish", "French"]}
+    >>>     {"genre": {"values": ["action", "comedy"]}},
+    >>>     {"language": {"values" ["Spanish", "French"]}}
     >>> ]
     >>> print("Let's query French or Spanish, action or comedy movies !")
-    >>> result = facets.filter(all_movies, selection).all()
+    >>> f.apply_filter(all_movies, selection).all()
 
 
 Links
