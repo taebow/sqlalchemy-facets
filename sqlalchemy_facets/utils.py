@@ -18,8 +18,7 @@ def get_column(base: Union[Selectable, Query], name: str):
                 for e in entity.entities:
                     if hasattr(e, name):
                         return getattr(e, name)
-            if isinstance(entity, _ColumnEntity) and \
-                    entity.column.name == name:
+            if isinstance(entity, _ColumnEntity) and entity.column.name == name:
                 return entity.column
     raise SQLAlchemyFacetsError(f"No field '{name}' on '{base}'")
 

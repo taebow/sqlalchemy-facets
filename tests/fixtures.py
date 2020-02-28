@@ -42,14 +42,3 @@ def get_simple_two_instances():
         ) for jk in join_keys
     ]
 
-
-class FacetOne(Facet):
-    name = "str_attribute_one"
-
-
-class FacetTwo(Facet):
-    name = "str_attribute_two"
-
-
-class FacetThree(Facet):
-    name = "int_attribute"

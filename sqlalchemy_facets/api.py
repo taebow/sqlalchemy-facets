@@ -1,24 +1,34 @@
-from typing import Sequence, Union
+from typing import Sequence, Union, Dict
 
 from sqlalchemy.orm import Query
-from sqlalchemy.sql.expression import BinaryExpression
 from sqlalchemy import and_
 
-from .query import FacetsQuery
 from .facet import build_facets
+from .query import QueryBuilder
 
 
-def get_facets(query: Query, facets: Union[dict, Sequence[str]]) -> FacetsQuery:
-    return FacetsQuery(
-        query=query,
-        facets=build_facets(facets)
-    )
+class FacetsDeclaration:
+
+    def __init__(self, facets: Union[Dict[str, dict], Sequence[str]] = None):
+        self.facets = build_facets(facets or [])
+
+    def get_facets(self, query: Query, facets: Union[Dict[str, dict], Sequence[str]] = None) -> Dict[str, dict]:
+        self.facets = build_facets(facets) if facets else self.facets
+        return QueryBuilder(query, self.facets).all()
+
+    def apply_filters(self, query: Query, selection: dict) -> Query:
+        return query \
+            .filter(
+                and_(
+                    self.facets[name].filter(query, filter_config)
+                    for name, filter_config in selection.items()
+                    if name in self.facets.keys()
+                )
+            )
 
 
-def get_filter(query: Query, facets: Union[dict, Sequence[str]], selection: dict) -> BinaryExpression:
-    facets = build_facets(facets)
-    return and_(
-        facets[name].filter(query, values)
-        for name, values in selection.items()
-        if name in facets.keys()
-    )
+def declare_facets(facets: Union[Dict[str, dict], Sequence[str]] = None) -> FacetsDeclaration:
+    return FacetsDeclaration(facets)
+
+
+f = declare_facets()
