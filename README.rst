@@ -10,7 +10,7 @@ easy-to-use and efficient helpers to build category based filters and do search
 with multiple criterias.
 
 .. image:: https://i.ibb.co/ZLHxGDv/work-in-progress.png
-   :width: 40pt
+   :width: 100pt
 
 
 Installing
