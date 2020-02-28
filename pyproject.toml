@@ -5,7 +5,7 @@ description = "Faceted search for SQLAlchemy"
 authors = ["Thibaut Frain <thibaut.frain@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.6"
+python = ">=3.6, <4"
 sqlalchemy = "^1.3.13"
 
 [tool.poetry.dev-dependencies]
