@@ -1,7 +1,7 @@
 import pytest
 
 from .db import session, Base, engine
-from .fixtures import FacetOne, FacetTwo, FacetThree, SimpleModelOne, \
+from .fixtures import SimpleModelOne, \
     SimpleModelTwo, SimpleFactoryOne, get_simple_two_instances
 
 
@@ -25,12 +25,10 @@ def seeds(request):
 
 
 FACETS = [
+    ["str_attribute_one"],
+    ["str_attribute_one", "str_attribute_two"],
     [],
-    [FacetOne],
-    [FacetTwo],
-    [FacetThree],
-    [FacetOne, FacetTwo, FacetThree],
-    ["str_attribute_two"]
+    {"custom_name_one": {"column_name": "str_attribute_one"}}
 ]
 
 SUBQUERY = session.query(SimpleModelOne)\

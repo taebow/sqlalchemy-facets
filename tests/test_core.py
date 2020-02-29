@@ -8,37 +8,40 @@ from .conftest import FACETS, QUERIES, SEEDS
 @pytest.mark.parametrize("facets_list", FACETS)
 @pytest.mark.parametrize("query", QUERIES)
 @pytest.mark.parametrize("seeds", SEEDS, indirect=True)
-def test_count(seeds, query, facets_list):
+def test_declare_count(seeds, query, facets_list):
 
-    facets = declare_facets(*facets_list)
+    f = declare_facets(facets_list)
 
-    facets_results = facets.from_query(query).all()
+    facets_results = f.get_facets(query)
     result = query.all()
     model, size = seeds
 
     assert len(facets_results) == len(facets_list)
 
-    for facet, facet_result in zip(facets.values(), facets_results):
-        assert sum([vc.count for vc in facet_result.values_count]) == len(result) <= size
+    facets = f.facets.values()
 
-        for value_count in facet_result.values_count:
+    for facet in facets:
+        assert sum([bucket["count"] for bucket in facets_results[facet.name]["buckets"]]) == len(result) <= size
+
+        for bucket in facets_results[facet.name]["buckets"]:
             result_count = len(list(filter(
-                lambda inst: getattr(inst, facet.name) == value_count.value,
+                lambda inst: getattr(inst, facet.column_name) == bucket["value"],
                 result
             )))
-            assert result_count == value_count.count
+            assert result_count == bucket["count"]
 
 
 @pytest.mark.parametrize("facets_list", FACETS)
 @pytest.mark.parametrize("query", QUERIES)
 @pytest.mark.parametrize("seeds", SEEDS, indirect=True)
-def test_filter(seeds, query, facets_list):
-    facets = declare_facets(*facets_list)
+def test_declare_filter(seeds, query, facets_list):
 
-    facets_results = facets.from_query(query).all()
+    f = declare_facets(facets_list)
 
-    for facet_result in facets_results:
-        for value_count in facet_result.values_count:
-            new_filter = [{"name": facet_result.facet.name, "values": [value_count.value]}]
-            facets_filter = facets.filter(query, new_filter)
-            assert len(query.filter(facets_filter).all()) == value_count.count
+    facets_results = f.get_facets(query)
+
+    for name, facet_result in facets_results.items():
+        for bucket in facet_result["buckets"]:
+            new_filter = {name: {"values": [bucket["value"]]}}
+            filtered_query = f.apply_filters(query, new_filter)
+            assert len(filtered_query.all()) == bucket["count"]
