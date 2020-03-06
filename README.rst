@@ -33,54 +33,71 @@ Model definition
 
 .. code-block:: python
 
-    class Movie(Base):
+    class Post(Base):
         id = Column(Integer, primary_key=True)
         name = Column(String)
-        genre = Column(String)
-        language = Column(String)
+        category = Column(String)
+        author = Column(String)
 
 
 Configuration
 ~~~~~~~~~~~~~~~~~~~~
 .. code-block:: python
 
-    from sqlalchemy_facets import declare_facets
+    from sqlalchemy_facets import FacetedQuery
 
-    f = declare_facets("genre", "language")
+    class FacetedBlog(FacetedQuery)
 
-Querying
-~~~~~~~~
+        category = TermsFacet()
+
+        author = TermsFacet(
+            limit=10,
+            order_by=desc("{bucket.doc_count}")
+        )
+
+
+Query API accessibility
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A faceted query is just a wrapper around an sqlalchemy query.
+
+Operators like joins, filter are seemlessly applied to the original query.
+
 .. code-block:: python
 
-    # Main query
-    all_movies = session.query(Movie)
+    posts = session.query(Post)
+    faceted_posts = FacetedBlog(posts)
 
-    # Facets query
-    facets = f.get_facets(all_movies)
+    posts.all() == faceted_posts.all() # => True
+
+    posts.filter(...).all() == faceted_posts.filter(...).all() # => True
+
+    posts.join(...).all() == faceted_posts.join(...).all() # => True
 
 
-Result
-~~~~~~
+Facets result
+~~~~~~~~~~~~~
 
 .. code-block:: python
 
-    >>> pprint(facets)
-    {
-        "genre" {
-            "buckets": [
-                {"value": "horror", "count": 23},
-                {"value": "action", "count": 52},
-                {"value": "comedy", "count": 34}
+    >>> pprint(faceted_posts.all().facets)
+    [
+        FacetResult(
+            name="category",
+            buckets=[
+                Bucket(value="database", doc_count=5),
+                Bucket(value="system", doc_count=7)
             ]
-        },
-        "language": {
-            "buckets": [
-                {"value": "English", "count": 75},
-                {"value": "Spanish", "count": 12},
-                {"value": "French", "count" 23}
+        ),
+        FacetResult(
+            name="author",
+            buckets=[
+                Bucket(value="Thibaut Frain" doc_count=12),
+                Bucket(value="Guest", doc_count=1)
             ]
-        }
-    }
+        )
+    ]
+
 
 
 Filter
