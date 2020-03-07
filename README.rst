@@ -52,27 +52,8 @@ Configuration
 
         author = TermsFacet(
             limit=10,
-            order_by=desc("{bucket.doc_count}")
+            order_by=desc("count")
         )
-
-
-Query API accessibility
-~~~~~~~~~~~~~~~~~~~~~~~
-
-A faceted query is just a wrapper around an sqlalchemy query.
-
-Operators like joins, filter are seemlessly applied to the original query.
-
-.. code-block:: python
-
-    posts = session.query(Post)
-    faceted_posts = FacetedBlog(posts)
-
-    posts.all() == faceted_posts.all() # => True
-
-    posts.filter(...).all() == faceted_posts.filter(...).all() # => True
-
-    posts.join(...).all() == faceted_posts.join(...).all() # => True
 
 
 Facets result
@@ -85,34 +66,66 @@ Facets result
         FacetResult(
             name="category",
             buckets=[
-                Bucket(value="database", doc_count=5),
-                Bucket(value="system", doc_count=7)
+                Bucket(value="database", count=5),
+                Bucket(value="system", count=7)
             ]
         ),
         FacetResult(
             name="author",
             buckets=[
-                Bucket(value="Thibaut Frain" doc_count=12),
-                Bucket(value="Guest", doc_count=1)
+                Bucket(value="Thibaut Frain" count=12),
+                Bucket(value="Guest", count=1)
             ]
         )
     ]
 
 
+Query API accessibility
+~~~~~~~~~~~~~~~~~~~~~~~
 
-Filter
-~~~~~~
+A faceted query is just a wrapper around an sqlalchemy query.
 
-Let's query (french OR spanish) AND (action OR comedy) movies !
+Operators like joins and filter are seemlessly applied to the original query.
 
 .. code-block:: python
 
-    >>> selection = [
-    >>>     {"genre":    {"values": ["action",  "comedy" ]}},
-    >>>     {"language": {"values": ["Spanish", "French"]}}
-    >>> ]
-    >>>
-    >>> f.apply_filter(all_movies, selection).all()
+    posts = session.query(Post)
+    faceted_posts = FacetedBlog(posts)
+
+    posts.all() == faceted_posts.all() # => True
+
+    posts.filter(...).all() == faceted_posts.filter(...).all() # => True
+
+
+Filter helper
+~~~~~~~~~~~~~
+
+Let's query only database related posts
+
+.. code-block:: python
+
+    database_posts = faceted_posts\
+        .facets_filter({
+            "category": ["database"]
+        })\
+        .all()
+
+    pprint(database_posts.facets)
+    [
+        FacetResult(
+            name="category",
+            buckets=[
+                Bucket(value="database", count=5),
+            ]
+        ),
+        FacetResult(
+            name="author",
+            buckets=[
+                Bucket(value="Thibaut Frain" count=4),
+                Bucket(value="Guest", count=1)
+            ]
+        )
+    ]
 
 
 Links
