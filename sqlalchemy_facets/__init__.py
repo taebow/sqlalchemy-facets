@@ -1,4 +1,4 @@
-from .api import declare_facets
-from .api import f
-from .facet import Facet
-from .facet import Mapper
+from .query import FacetedQuery
+
+class TermsFacet:
+    pass

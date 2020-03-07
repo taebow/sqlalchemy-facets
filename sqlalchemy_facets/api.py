@@ -4,7 +4,7 @@ from sqlalchemy.orm import Query
 from sqlalchemy import and_
 
 from .facet import build_facets
-from .query import QueryBuilder
+from ._query import QueryBuilder
 
 
 class FacetsDeclaration:

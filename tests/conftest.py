@@ -31,5 +31,4 @@ QUERIES = [
     session.query(Post.id, Post.name),
     session.query(subquery.subquery()),
     session.query(subquery.cte()),
-    session.query(Post).join(Author)
 ]
