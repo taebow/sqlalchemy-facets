@@ -1,44 +1,39 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
 
-from sqlalchemy_facets import Facet
-
 from .db import session, Base
 
-join_keys = ("jkl", "mno", "pqr", "stu")
+authors = [Faker("name").generate() for _ in range(3)]
+categories = ["system", "database", "api"]
 
-
-class SimpleModelOne(Base):
-    __tablename__ = "simple_one"
+class Author(Base):
+    __tablename__ = "author"
     id = Column(Integer, primary_key=True)
-    str_attribute_one = Column(String)
-    str_attribute_two = Column(String, ForeignKey("simple_two.str_attribute_two"))
-    int_attribute = Column(Integer)
+    name = Column(String)
+
+    @classmethod
+    def create_all(cls):
+        session.add_all([Author(name=name) for name in authors])
 
 
-class SimpleModelTwo(Base):
-    __tablename__ = "simple_two"
-    str_attribute_two = Column(String, primary_key=True)
-    str_attribute_three = Column(String)
+class Post(Base):
+    __tablename__ = "post"
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    category = Column(String)
+    author_id = Column(Integer, ForeignKey(Author.id))
+    author = relationship(Author)
 
 
-class SimpleFactoryOne(SQLAlchemyModelFactory):
+class PostFactory(SQLAlchemyModelFactory):
     class Meta:
-        model = SimpleModelOne
+        model = Post
         sqlalchemy_session = session
 
-    str_attribute_one = Faker("random_element", elements=("abc", "def", "ghi"))
-    str_attribute_two = Faker("random_element", elements=join_keys)
-    int_attribute = Faker("random_element", elements=(123, 987))
-
-
-def get_simple_two_instances():
-    name = Faker("name")
-    return [
-        SimpleModelTwo(
-            str_attribute_two=jk,
-            str_attribute_three=name.generate()
-        ) for jk in join_keys
-    ]
-
+    name = Faker("sentence")
+    category = Faker("random_element", elements=categories)
+    author_id = Faker(
+        "random_element", elements=[i for i in range(1, len(authors)+1)]
+    )

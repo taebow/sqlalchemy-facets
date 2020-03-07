@@ -97,6 +97,7 @@ Operators like joins and filter are seemlessly applied to the original query.
     posts.filter(...).all() == faceted_posts.filter(...).all() # => True
 
 
+
 Filter helper
 ~~~~~~~~~~~~~
 
