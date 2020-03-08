@@ -3,7 +3,7 @@ from random import choice
 import pytest
 
 from .db import session, Base, engine
-from .fixtures import Author, Post, PostFactory, categories, authors
+from .fixtures import Author, Post, PostFactory, categories
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -19,8 +19,6 @@ def tables():
 def data(tables):
     Author.create_all()
     PostFactory.create_batch(77)
-    yield
-    session.rollback()
 
 
 subquery = session.query(Post).filter(Post.category == choice(categories))

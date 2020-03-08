@@ -13,12 +13,33 @@ class FacetedBlog(FacetedQuery):
 
 
 @pytest.mark.parametrize("query", QUERIES)
-def test_query_accessibility_on_filter(query):
+def test_query_accessibility_one_filter(query):
 
     faceted_query = FacetedBlog(query)
     filter = Post.category == choice(categories)
 
-    assert query.filter(filter).all() == faceted_query.filter(filter).all()
+    query = query.filter(filter)
+    faceted_query = faceted_query.filter(filter)
+
+    assert isinstance(faceted_query, FacetedQuery)
+    assert query.all() == faceted_query.all()
+
+
+@pytest.mark.parametrize("query", QUERIES)
+def test_query_accessibility_two_filters(query):
+
+    faceted_query = FacetedBlog(query)
+    filters = [
+        Post.category == choice(categories)
+        for _ in range(2)
+    ]
+
+    for filter in filters:
+        query = query.filter(filter)
+        faceted_query = faceted_query.filter(filter)
+
+    assert isinstance(faceted_query, FacetedQuery)
+    assert query.all() == faceted_query.all()
 
 
 @pytest.mark.parametrize("query", QUERIES)
@@ -26,6 +47,8 @@ def test_query_accessibility_on_join(query):
 
     faceted_query = FacetedBlog(query)
 
-    assert query.join(Author).all() == faceted_query.join(Author).all()
+    query = query.join(Author)
+    faceted_query = faceted_query.join(Author)
 
-
+    assert isinstance(faceted_query, FacetedQuery)
+    assert query.all() == faceted_query.all()
