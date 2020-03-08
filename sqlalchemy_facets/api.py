@@ -3,7 +3,7 @@ from typing import Sequence, Union, Dict
 from sqlalchemy.orm import Query
 from sqlalchemy import and_
 
-from .facet import build_facets
+from ._facet import build_facets
 from ._query import QueryBuilder
 
 

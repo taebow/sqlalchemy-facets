@@ -1,4 +1,6 @@
 from .query import FacetedQuery
-
-class TermsFacet:
-    pass
+from .types import FacetResult
+from .types import Bucket
+from .types import FacetedResult
+from .facet import Facet
+from .facet import TermsFacet

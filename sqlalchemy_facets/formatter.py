@@ -1,6 +1,6 @@
 from typing import Sequence, NamedTuple
 
-from .facet import Facet
+from ._facet import Facet
 
 
 class ValueCount(NamedTuple):
