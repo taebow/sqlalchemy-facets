@@ -1,5 +1,6 @@
-from typing import NamedTuple, Any, List
+from typing import NamedTuple, Any, List, Sequence
 
+from .facet import Facet
 
 class Bucket(NamedTuple):
 
@@ -13,5 +14,28 @@ class FacetResult(NamedTuple):
     buckets: List[Bucket]
 
 
+    @staticmethod
+    def from_dual_sequences(facet: Facet, values: Sequence,
+                            counts: Sequence) -> "FacetResult":
+        return FacetResult(
+            name=facet.name,
+            buckets=sorted(
+                [
+                    Bucket(
+                        value=v,
+                        count=counts[i]
+                    )
+                    for i, v in enumerate(values)
+                    if v is not None
+                ],
+                key=lambda v: v.count,
+                reverse=True,
+            )
+        )
+
+
 class FacetedResult(list):
-    pass
+
+    def __init__(self, base_result, facets):
+        super().__init__(base_result)
+        self.facets = facets

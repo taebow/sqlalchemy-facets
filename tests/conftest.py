@@ -26,7 +26,7 @@ subquery = session.query(Post).filter(Post.category == choice(categories))
 QUERIES = [
     session.query(Post),
     session.query(Post).filter(Post.category == choice(categories)),
-    session.query(Post.id, Post.name),
+    session.query(Post.id, Post.name, Post.category),
     session.query(subquery.subquery()),
     session.query(subquery.cte()),
 ]

@@ -19,3 +19,5 @@ class Facet(ABC):
         self._name = value
         if not self.column_name:
             self.column_name = value
+
+    def column(self):
