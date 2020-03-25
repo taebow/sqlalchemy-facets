@@ -28,3 +28,4 @@ def get_primary_key(base: Selectable) -> str:
         if column.primary_key:
             return column.name
     raise SQLAlchemyFacetsError(f"Could not find any primary key on '{base}'")
+

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from factory import Faker
 from factory.alchemy import SQLAlchemyModelFactory
@@ -24,7 +24,9 @@ class Post(Base):
     name = Column(String)
     category = Column(String)
     author_id = Column(Integer, ForeignKey(Author.id))
+    published = Column(Boolean)
     author = relationship(Author)
+
 
 
 class PostFactory(SQLAlchemyModelFactory):
@@ -37,3 +39,4 @@ class PostFactory(SQLAlchemyModelFactory):
     author_id = Faker(
         "random_element", elements=[i for i in range(1, len(authors)+1)]
     )
+    published = Faker("random_element", elements=[True, False])

@@ -10,19 +10,20 @@ from .types import FacetedResult, FacetResult
 from .utils import get_column, get_primary_key
 
 
+def sub_facets(facets):
+    facets_by_name = OrderedDict()
+    for name, facet_instance in facets.items():
+        if isinstance(facet_instance, Facet):
+            facets_by_name[name] = facet_instance
+            facet_instance.name = name
+    return facets_by_name
+
+
 class FacetedQueryMeta(type):
 
     def __init__(cls, classname, bases, dict_):
-        cls.setup_facets(cls, cls.__dict__)
+        setattr(cls, "_facets", sub_facets(cls.__dict__))
         type.__init__(cls, classname, bases, dict_)
-
-    @staticmethod
-    def setup_facets(cls, dict_):
-        setattr(cls, "_facets", OrderedDict())
-        for k, class_attribute in dict_.items():
-            if isinstance(class_attribute, Facet):
-                cls._facets[k] = class_attribute
-                class_attribute.name = k
 
 
 class FacetedQuery(metaclass=FacetedQueryMeta):

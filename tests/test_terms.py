@@ -1,8 +1,6 @@
-from random import choice
 from collections import Counter
 import pytest
 
-from .fixtures import Post, categories, Author
 from .conftest import QUERIES
 
 from sqlalchemy_facets import FacetedQuery, TermsFacet, FacetResult, Bucket
@@ -51,4 +49,3 @@ def test_buckets_count(query):
         )
         for bucket in facet.buckets:
             assert bucket.count == result_counter[bucket.value]
-

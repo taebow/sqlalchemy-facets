@@ -101,7 +101,7 @@ Operators like joins and filter are seemlessly applied to the original query.
 Filter helper
 ~~~~~~~~~~~~~
 
-Let's query only database related posts
+Let's query posts with category = 'database' only
 
 .. code-block:: python
 

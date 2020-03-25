@@ -22,7 +22,7 @@ class FacetResult(NamedTuple):
             buckets=sorted(
                 [
                     Bucket(
-                        value=v,
+                        value=facet.mapper[v],
                         count=counts[i]
                     )
                     for i, v in enumerate(values)
