@@ -44,3 +44,25 @@ def test_column_name_override():
         some_attr = FacetMock("another")
 
     assert TestFacetedQuery._facets["some_attr"].column_name == "another"
+
+
+def test_sub_facets_init():
+
+    class FacetMock1(Facet):
+        pass
+
+    class FacetMock2(Facet):
+        pass
+
+
+    class TestFacetedQuery(FacetedQuery):
+
+        root_attr1 = FacetMock1(
+            sub_attr = FacetMock2()
+        )
+
+        root_attr2 = FacetMock1(
+            sub_attr = FacetMock2()
+        )
+
+    assert len(TestFacetedQuery["facets_index"]) == 3

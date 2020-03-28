@@ -7,8 +7,35 @@ from sqlalchemy import func, distinct
 
 from .facet import Facet
 from .types import FacetedResult, FacetResult
-from .utils import get_column, get_primary_key
+from .utils import get_column, get_primary_key, translate_grouping
 
+def setup_col_name_index(facets, col_index):
+    for facet in facets:
+        if facet.name in col_index.keys():
+            facet.col_index = col_index.index(facet.name)
+        else:
+            col_index[facet.name] = facet
+            facet.col_index = len(col_index)-1
+
+        setup_col_name_index(facet.children, col_index)
+
+    return col_index
+
+
+def setup_grouping_index(facets, col_count, grouping_index):
+    for facet in facets:
+        base_grouping = facet.parent.grouping if facet.parent else []
+        facet.grouping = base_grouping + [facet.col_index]
+        index_value = translate_grouping(facet.grouping, col_count)
+
+        if index_value not in grouping_index.keys():
+            grouping_index[index_value] = [facet]
+        else:
+            grouping_index[index_value].append(facet)
+
+        setup_grouping_index(facet.children, col_count, grouping_index)
+
+    return grouping_index
 
 def sub_facets(facets):
     facets_by_name = OrderedDict()
@@ -22,7 +49,15 @@ def sub_facets(facets):
 class FacetedQueryMeta(type):
 
     def __init__(cls, classname, bases, dict_):
-        setattr(cls, "_facets", sub_facets(dict_))
+        root_facets = sub_facets(dict_)
+        col_index = setup_col_name_index(root_facets.values(), {})
+        grouping_index = setup_grouping_index(
+            root_facets.values(), len(col_index), {}
+        )
+
+        setattr(cls, "_root_facets", root_facets)
+        setattr(cls, "_col_index", col_index)
+        setattr(cls, "_grouping_index", grouping_index)
         type.__init__(cls, classname, bases, dict_)
 
 
