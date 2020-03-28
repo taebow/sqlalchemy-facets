@@ -31,4 +31,4 @@ def get_primary_key(base: Selectable) -> str:
 
 
 def translate_grouping(pos, length):
-    return (2**length)-sum([2**(length-p-1) for p in pos]) -1
+    return int((2**length)*(1-sum([2**(-p-1) for p in pos])) -1)
