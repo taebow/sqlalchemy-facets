@@ -22,7 +22,7 @@ def sub_facets(facets):
 class FacetedQueryMeta(type):
 
     def __init__(cls, classname, bases, dict_):
-        setattr(cls, "_facets", sub_facets(cls.__dict__))
+        setattr(cls, "_facets", sub_facets(dict_))
         type.__init__(cls, classname, bases, dict_)
 
 

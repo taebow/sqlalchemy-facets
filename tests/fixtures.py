@@ -6,7 +6,7 @@ from factory.alchemy import SQLAlchemyModelFactory
 from .db import session, Base
 
 authors = [Faker("name").generate() for _ in range(3)]
-categories = ["system", "database", "api"]
+categories = ["system", "database", "api", None]
 
 class Author(Base):
     __tablename__ = "author"
@@ -26,6 +26,7 @@ class Post(Base):
     author_id = Column(Integer, ForeignKey(Author.id))
     published = Column(Boolean)
     author = relationship(Author)
+    can_be_null = Column(String)
 
 
 
