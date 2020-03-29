@@ -1,6 +1,7 @@
 from abc import ABC
 from ..mapper import Mapper, IdentityMapper
 from ..utils import SQLAlchemyFacetsError
+from ..types import FacetResult
 
 class Facet(ABC):
 
@@ -50,3 +51,22 @@ class Facet(ABC):
             self.grouping_index = self.parent.grouping_index + [index]
         else:
             self.grouping_index = [index]
+
+    def get_or_create_facet_result(self, root, raw_result):
+        if self.parent:
+            parent_fr = \
+                self.parent.get_or_create_facet_result(root, raw_result)
+            parent_bucket = parent_fr._buckets[raw_result[self.parent.col_index]]
+            if self.name not in parent_bucket._children.keys():
+                facet_result = FacetResult(name=self.name)
+                parent_bucket._children[self.name] = facet_result
+            else:
+                facet_result = parent_bucket._children[self.name]
+            return facet_result
+        else:
+            if self.name not in root.keys():
+                facet_result = FacetResult(name=self.name)
+                root[self.name] = facet_result
+            else:
+                facet_result = root[self.name]
+            return facet_result

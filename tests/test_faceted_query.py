@@ -14,11 +14,11 @@ def test_facets_declaration_setup():
         another = FacetMock()
 
     def test_facet_setup(class_, name):
-        assert isinstance(class_._facets, dict)
-        assert len(class_._facets) == 1
-        assert name in class_._facets
-        assert isinstance(class_._facets[name], FacetMock)
-        assert class_._facets[name].name == name
+        assert isinstance(class_._root_facets, dict)
+        assert len(class_._root_facets) == 1
+        assert name in class_._root_facets
+        assert isinstance(class_._root_facets[name], FacetMock)
+        assert class_._root_facets[name].name == name
 
     test_facet_setup(TestFacetedQuery, "some_attr")
     test_facet_setup(TestFacetedQuery2, "another")
@@ -32,7 +32,7 @@ def test_default_column_name():
     class TestFacetedQuery(FacetedQuery):
         some_attr = FacetMock()
 
-    assert TestFacetedQuery._facets["some_attr"].column_name == "some_attr"
+    assert TestFacetedQuery._root_facets["some_attr"].column_name == "some_attr"
 
 
 def test_column_name_override():
@@ -43,7 +43,7 @@ def test_column_name_override():
     class TestFacetedQuery(FacetedQuery):
         some_attr = FacetMock("another")
 
-    assert TestFacetedQuery._facets["some_attr"].column_name == "another"
+    assert TestFacetedQuery._root_facets["some_attr"].column_name == "another"
 
 
 def test_sub_facets_init():
@@ -65,4 +65,7 @@ def test_sub_facets_init():
             sub_attr = FacetMock2()
         )
 
-    assert len(TestFacetedQuery["facets_index"]) == 3
+    print(TestFacetedQuery._column_facets)
+    for f in TestFacetedQuery._column_facets:
+        print(f.name)
+    assert len(TestFacetedQuery._column_facets) == 3

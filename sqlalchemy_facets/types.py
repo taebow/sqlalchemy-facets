@@ -1,37 +1,27 @@
-from typing import NamedTuple, Any, List, Sequence
+from typing import NamedTuple, Any
+from collections import OrderedDict
 
-from .facet import Facet
+class Bucket:
 
-class Bucket(NamedTuple):
+    def __init__(self, value: Any, count: int):
+        self.value = value
+        self.count = count
+        self._children = OrderedDict()
 
-    value: Any
-    count: int
-
-
-class FacetResult(NamedTuple):
-
-    name: str
-    buckets: List[Bucket]
+    @property
+    def children(self):
+        return list(self._children.values())
 
 
-    @staticmethod
-    def from_dual_sequences(facet: Facet, values: Sequence,
-                            counts: Sequence) -> "FacetResult":
-        return FacetResult(
-            name=facet.name,
-            buckets=sorted(
-                [
-                    Bucket(
-                        value=facet.mapper[v],
-                        count=counts[i]
-                    )
-                    for i, v in enumerate(values)
-                    if v is not None
-                ],
-                key=lambda v: v.count,
-                reverse=True,
-            )
-        )
+class FacetResult:
+
+    def __init__(self, name: str):
+        self.name = name
+        self._buckets = OrderedDict()
+
+    @property
+    def buckets(self):
+        return list(self._buckets.values())
 
 
 class FacetedResult(list):
