@@ -3,7 +3,7 @@ from functools import wraps
 from collections import OrderedDict
 
 from sqlalchemy.orm import Query
-from sqlalchemy import func, distinct, tuple_
+from sqlalchemy import func, distinct, tuple_, desc
 
 from .facet import Facet
 from .types import FacetedResult, FacetResult, Bucket
@@ -103,14 +103,17 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
                 tuple_(*[self._column_facets[i].facet_column(base) for i in s])
             )
 
+        grouping_col = func.grouping(*facet_columns).label("_grouping")
 
         return self.session.query(
-            *[
-                *facet_columns,
-                func.grouping(*facet_columns),
-                func.count(distinct(count_column))
-            ]
-        ).group_by(func.grouping_sets(*grouping_sets))
+                *[
+                    *facet_columns,
+                    grouping_col,
+                    func.count(distinct(count_column))
+                ]
+            )\
+            .group_by(func.grouping_sets(*grouping_sets))\
+            .order_by(desc(grouping_col))
 
 
     def facets(self):
@@ -121,10 +124,11 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
 
     def formatter(self, raw_results: List[Tuple]) -> List[FacetResult]:
         result = OrderedDict()
+        facet_results_cache = FacetResultCache()
         for raw_result in raw_results:
             facets = self._grouping_index[raw_result[-2]]
             for facet in facets:
-                facet_result = facet.get_or_create_facet_result(result, raw_result)
+                facet_result = facet_results_cache.get(facet, result, raw_result)
                 facet_result._buckets[raw_result[facet.col_index]] = Bucket(
                     value=facet.mapper[raw_result[facet.col_index]],
                     count=raw_result[-1]
@@ -137,5 +141,24 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
             facets=self.facets()
         )
 
+class FacetResultCache:
 
+    def __init__(self):
+        self.cache = dict()
 
+    def get(self, facet, root, raw_result):
+        if facet.parent:
+            key = tuple([raw_result[-2], facet.parent.mask_values(raw_result)])
+        else:
+            key = raw_result[-2]
+
+        if key in self.cache.keys():
+            result = self.cache[key]
+        else:
+            self.cache[key] = facet.get_facet_result(
+                root,
+                raw_result
+            )
+            result = self.cache[key]
+
+        return result

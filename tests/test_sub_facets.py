@@ -7,15 +7,22 @@ from sqlalchemy_facets import FacetedQuery, TermsFacet, FacetResult, Bucket
 
 class FacetedBlog(FacetedQuery):
 
-    category = TermsFacet()
+    category = TermsFacet(
+        author_id=TermsFacet()
+    )
 
+    author_id=TermsFacet(
+        published=TermsFacet()
+    )
+
+    published=TermsFacet()
 
 @pytest.mark.parametrize("query", QUERIES)
 def test_return_types(query):
     faceted_query = FacetedBlog(query)
     facets = faceted_query.all().facets
 
-    assert len(facets) == 1
+    assert len(facets) == 3
     for facet in faceted_query.all().facets:
         assert isinstance(facet, FacetResult)
         assert len(facet.buckets) > 0

@@ -52,21 +52,20 @@ class Facet(ABC):
         else:
             self.grouping_index = [index]
 
-    def get_or_create_facet_result(self, root, raw_result):
+    def get_facet_result(self, root, raw_result):
         if self.parent:
-            parent_fr = \
-                self.parent.get_or_create_facet_result(root, raw_result)
-            parent_bucket = parent_fr._buckets[raw_result[self.parent.col_index]]
-            if self.name not in parent_bucket._children.keys():
-                facet_result = FacetResult(name=self.name)
-                parent_bucket._children[self.name] = facet_result
-            else:
-                facet_result = parent_bucket._children[self.name]
-            return facet_result
+            print(self.parent.get_facet_result(root, raw_result)._buckets)
+            container = self.parent\
+                .get_facet_result(root, raw_result)\
+                ._buckets[raw_result[self.parent.col_index]]\
+                ._children
         else:
-            if self.name not in root.keys():
-                facet_result = FacetResult(name=self.name)
-                root[self.name] = facet_result
-            else:
-                facet_result = root[self.name]
-            return facet_result
+            container = root
+
+        if self.name not in container.keys():
+            container[self.name] = FacetResult(name=self.name)
+
+        return container[self.name]
+
+    def mask_values(self, raw_result):
+        return tuple(raw_result[index] for index in self.grouping)
