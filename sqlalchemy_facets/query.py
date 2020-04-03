@@ -32,7 +32,7 @@ def setup_grouping_index(facets, col_count: int, grouping_index=None,
         sets.add(frozenset(x for x in facet.grouping))
         key = facet.grouping_key(col_count)
 
-        if facet.grouping_key(col_count) in grouping_index.keys():
+        if key in grouping_index.keys():
             grouping_index[key].append(facet)
         else:
             grouping_index[key] = [facet]
