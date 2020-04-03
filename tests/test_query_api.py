@@ -14,7 +14,6 @@ class FacetedBlog(FacetedQuery):
 
 @pytest.mark.parametrize("query", QUERIES)
 def test_query_accessibility_one_filter(query):
-
     faceted_query = FacetedBlog(query)
     filter = Post.category == choice(categories)
 

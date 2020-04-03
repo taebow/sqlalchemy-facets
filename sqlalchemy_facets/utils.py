@@ -28,7 +28,3 @@ def get_primary_key(base: Selectable) -> str:
         if column.primary_key:
             return column.name
     raise SQLAlchemyFacetsError(f"Could not find any primary key on '{base}'")
-
-
-def translate_grouping(pos, length):
-    return int((2**length)*(1-sum([2**(-p-1) for p in pos])) -1)

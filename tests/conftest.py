@@ -17,16 +17,18 @@ def tables():
 @pytest.fixture(scope="session", autouse=True)
 def data(tables):
     Author.create_all()
-    PostFactory.create_batch(77)
+    PostFactory.create_batch(631)
     session.commit()
 
 
-subquery = session.query(Post).filter(Post.category == choice(categories))
+_subquery = session.query(Post).filter(Post.category == choice(categories))
+subquery = _subquery.subquery()
+cte = _subquery.cte()
 
 QUERIES = [
     session.query(Post),
     session.query(Post).filter(Post.category == choice(categories)),
     session.query(Post.id, Post.name, Post.category, Post.author_id, Post.published),
-    session.query(subquery.subquery()),
-    session.query(subquery.cte()),
+    session.query(Post).join(subquery, Post.id == subquery.c.id),
+    session.query(Post).join(cte, Post.id == cte.c.id)
 ]

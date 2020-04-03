@@ -1,7 +1,6 @@
 from abc import ABC
 from ..mapper import Mapper, IdentityMapper
 from ..utils import SQLAlchemyFacetsError
-from ..types import FacetResult
 
 class Facet(ABC):
 
@@ -11,12 +10,13 @@ class Facet(ABC):
         self.mapper = IdentityMapper()
         self.children = []
         self.parent = None
+        self.grouping = []
 
         for arg in args:
             if isinstance(arg, str):
                 self.column_name = arg
 
-        for k, v in kwargs.items():
+        for k, v in reversed(kwargs.items()):
 
             if isinstance(v, Facet):
                 self.children.append(v)
@@ -45,27 +45,22 @@ class Facet(ABC):
     def facet_column(self, base):
         raise NotImplementedError
 
-    def setup_index(self, index):
-        self.col_index = index
-        if self.parent:
-            self.grouping_index = self.parent.grouping_index + [index]
-        else:
-            self.grouping_index = [index]
+    def setup(self, col_index: int):
+        self.col_index = col_index
+        self.grouping = getattr(
+            self.parent, "grouping", list()
+        ) + [col_index]
 
-    def get_facet_result(self, root, raw_result):
-        if self.parent:
-            print(self.parent.get_facet_result(root, raw_result)._buckets)
-            container = self.parent\
-                .get_facet_result(root, raw_result)\
-                ._buckets[raw_result[self.parent.col_index]]\
-                ._children
-        else:
-            container = root
 
-        if self.name not in container.keys():
-            container[self.name] = FacetResult(name=self.name)
+    def grouping_key(self, col_count):
+        return int(
+            (2**col_count)*(1-sum([2**(-p-1) for p in self.grouping]))-1
+        )
 
-        return container[self.name]
 
-    def mask_values(self, raw_result):
-        return tuple(raw_result[index] for index in self.grouping)
+    def result_key(self, result_row: tuple):
+        buckets_mask = (
+            result_row[index]
+            for index in getattr(self.parent, "grouping", ())
+        )
+        return (result_row[-2], *buckets_mask)

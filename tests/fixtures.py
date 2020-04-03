@@ -11,7 +11,7 @@ categories = ["system", "database", "api", None]
 class Author(Base):
     __tablename__ = "author"
     id = Column(Integer, primary_key=True)
-    name = Column(String)
+    name = Column(String, index=True)
 
     @classmethod
     def create_all(cls):
@@ -22,11 +22,11 @@ class Post(Base):
     __tablename__ = "post"
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    category = Column(String)
+    category = Column(String, index=True)
     author_id = Column(Integer, ForeignKey(Author.id))
-    published = Column(Boolean)
+    published = Column(Boolean, index=True)
     author = relationship(Author)
-    can_be_null = Column(String)
+    can_be_null = Column(String, index=True)
 
 
 

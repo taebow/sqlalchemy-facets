@@ -1,4 +1,3 @@
-from typing import List, Tuple
 from functools import wraps
 from collections import OrderedDict
 
@@ -6,21 +5,21 @@ from sqlalchemy.orm import Query
 from sqlalchemy import func, distinct, tuple_, desc
 
 from .facet import Facet
-from .types import FacetedResult, FacetResult, Bucket
-from .utils import get_column, get_primary_key, translate_grouping
+from .result import FacetedResult
+from .utils import get_column, get_primary_key
+
 
 
 # noinspection PyDefaultArgument
 def setup_query_columns(facets, col_names=None, result=None):
     col_names, result = col_names or [], result or []
     for facet in facets:
-        if facet.name in col_names:
-            facet.col_index = col_names.index(facet.name)
-        else:
+        if facet.name not in col_names:
             col_names.append(facet.name)
             result.append(facet)
-            facet.col_index = len(col_names)-1
+        facet.setup(col_names.index(facet.name))
 
+    for facet in facets:
         setup_query_columns(facet.children, col_names, result)
 
     return result
@@ -30,15 +29,13 @@ def setup_grouping_index(facets, col_count: int, grouping_index=None,
                          sets=None):
     grouping_index, sets = grouping_index or dict(), sets or set()
     for facet in facets:
-        base_grouping = facet.parent.grouping if facet.parent else []
-        facet.grouping = base_grouping + [facet.col_index]
-        index_value = translate_grouping(facet.grouping, col_count)
         sets.add(frozenset(x for x in facet.grouping))
+        key = facet.grouping_key(col_count)
 
-        if index_value not in grouping_index.keys():
-            grouping_index[index_value] = [facet]
+        if facet.grouping_key(col_count) in grouping_index.keys():
+            grouping_index[key].append(facet)
         else:
-            grouping_index[index_value].append(facet)
+            grouping_index[key] = [facet]
 
         setup_grouping_index(facet.children, col_count, grouping_index, sets)
 
@@ -46,7 +43,7 @@ def setup_grouping_index(facets, col_count: int, grouping_index=None,
 
 def sub_facets(facets):
     facets_by_name = OrderedDict()
-    for name, facet_instance in facets.items():
+    for name, facet_instance in reversed(facets.items()):
         if isinstance(facet_instance, Facet):
             facets_by_name[name] = facet_instance
             facet_instance.name = name
@@ -61,7 +58,6 @@ class FacetedQueryMeta(type):
         grouping_index, sets = setup_grouping_index(
             root_facets.values(), len(column_facets)
         )
-
         setattr(cls, "_root_facets", root_facets)
         setattr(cls, "_column_facets", column_facets)
         setattr(cls, "_sets", sets)
@@ -71,9 +67,8 @@ class FacetedQueryMeta(type):
 
 class FacetedQuery(metaclass=FacetedQueryMeta):
 
-    def __init__(self, query: Query):
-        self.base = query
-
+    def __init__(self, query: Query, parallel=None):
+        self.base = query.limit(None).offset(None)
 
     def __getattr__(self, item):
         base_item = getattr(self.base, item)
@@ -86,22 +81,30 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
             return self
         return wrapped
 
-
+    @property
     def facets_query(self):
         base = self.base.cte()
+
+        # Get facets columns
         facet_columns = [
             f.facet_column(base)
             for f in self._column_facets
         ]
+
+        # Get count column
         count_field = get_primary_key(base)
         count_column = get_column(base, count_field)
-        grouping_sets = []
-        for s in self._sets:
-            grouping_sets.append(
-                self._column_facets[next(iter(s))].facet_column(base)
-                if len(s) == 1 else
-                tuple_(*[self._column_facets[i].facet_column(base) for i in s])
-            )
+
+        # Grouping sets columns
+        grouping_sets = [
+            self._column_facets[next(iter(s))].facet_column(base)
+            if len(s) == 1 else
+            tuple_(*[
+                self._column_facets[i].facet_column(base)
+                for i in s
+            ])
+            for s in self._sets
+        ]
 
         grouping_col = func.grouping(*facet_columns).label("_grouping")
 
@@ -117,48 +120,15 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
 
 
     def facets(self):
-        return self.formatter(
-            self.facets_query() if self._column_facets else []
+        return FacetedResult.build_result(
+            self.facets_query.all(),
+            self._grouping_index
         )
 
-
-    def formatter(self, raw_results: List[Tuple]) -> List[FacetResult]:
-        result = OrderedDict()
-        facet_results_cache = FacetResultCache()
-        for raw_result in raw_results:
-            facets = self._grouping_index[raw_result[-2]]
-            for facet in facets:
-                facet_result = facet_results_cache.get(facet, result, raw_result)
-                facet_result._buckets[raw_result[facet.col_index]] = Bucket(
-                    value=facet.mapper[raw_result[facet.col_index]],
-                    count=raw_result[-1]
-                )
-        return list(result.values())
 
     def all(self):
         return FacetedResult(
             base_result=self.base.all(),
-            facets=self.facets()
+            raw_faceted_result=self.facets_query.all(),
+            grouping_index=self._grouping_index
         )
-
-class FacetResultCache:
-
-    def __init__(self):
-        self.cache = dict()
-
-    def get(self, facet, root, raw_result):
-        if facet.parent:
-            key = tuple([raw_result[-2], facet.parent.mask_values(raw_result)])
-        else:
-            key = raw_result[-2]
-
-        if key in self.cache.keys():
-            result = self.cache[key]
-        else:
-            self.cache[key] = facet.get_facet_result(
-                root,
-                raw_result
-            )
-            result = self.cache[key]
-
-        return result

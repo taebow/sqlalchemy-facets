@@ -65,7 +65,4 @@ def test_sub_facets_init():
             sub_attr = FacetMock2()
         )
 
-    print(TestFacetedQuery._column_facets)
-    for f in TestFacetedQuery._column_facets:
-        print(f.name)
     assert len(TestFacetedQuery._column_facets) == 3

@@ -30,8 +30,8 @@ def test_buckets_value(query):
 
     assert len(faceted_result.facets) > 0
     for facet in faceted_result.facets:
-        assert len(facet.buckets) > 0
         result_values = [getattr(r, facet.name) for r in faceted_result]
+
         for bucket in facet.buckets:
             assert bucket.value in result_values
 
@@ -43,10 +43,11 @@ def test_buckets_count(query):
 
     assert len(faceted_result.facets) > 0
     for facet in faceted_result.facets:
-        assert len(facet.buckets) > 0
         result_counter = Counter(
             [getattr(r, facet.name) for r in faceted_result]
         )
+
         for bucket in facet.buckets:
             assert bucket.count == result_counter[bucket.value]
 
+        assert sum([b.count for b in facet.buckets]) == len(faceted_result)
