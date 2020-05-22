@@ -2,19 +2,48 @@ from __future__ import annotations
 from typing import Any
 from collections import OrderedDict
 
+
 class FacetResultContainer:
 
-    def __init__(self):
+    def __init__(self, raw_faceted_result=None, grouping_index=None):
         self._facet_results = OrderedDict()
-
-    def get_facet_result(self, name):
-        if name not in self._facet_results.keys():
-            self._facet_results[name] = FacetResult(name)
-        return self._facet_results[name]
+        if raw_faceted_result and grouping_index:
+            self.build_result(raw_faceted_result, grouping_index)
 
     @property
-    def facet_results(self):
+    def facets(self):
         return list(self._facet_results.values())
+
+    def build_result(self, raw_faceted_result, grouping_index):
+        cache = dict()
+        for result_row in raw_faceted_result:
+            for facet in grouping_index[result_row[-2]]:
+                bucket = Bucket(
+                    value=facet.mapper[result_row[facet.col_index]],
+                    count=result_row[-1]
+                )
+                self.get_facet_result(
+                    facet, result_row, cache
+                ).add_bucket(bucket)
+
+    def get_facet_result(self, facet, result_row, cache):
+        key = facet.result_key(result_row)
+
+        if key not in cache.keys():
+            if facet.parent:
+                container = self.get_facet_result(
+                    facet.parent, result_row, cache
+                ).get_bucket(result_row[facet.parent.col_index])
+
+            else:
+                container = self
+
+            if facet.name not in container._facet_results.keys():
+                container._facet_results[facet.name] = FacetResult(facet.name)
+
+            cache[key] = container._facet_results[facet.name]
+
+        return cache[key]
 
 
 class Bucket(FacetResultContainer):
@@ -42,43 +71,10 @@ class FacetResult:
         return self._buckets[value]
 
 
-class FacetedResult(list):
+class FacetedResult(list, FacetResultContainer):
 
     def __init__(self, base_result, raw_faceted_result, grouping_index):
-        super().__init__(base_result)
-        self.facets = self.build_result(raw_faceted_result, grouping_index)
-
-    @classmethod
-    def build_result(cls, raw_faceted_result, grouping_index):
-        result = FacetResultContainer()
-        cache = dict()
-        for result_row in raw_faceted_result:
-            for facet in grouping_index[result_row[-2]]:
-                value = facet.mapper[result_row[facet.col_index]]
-                cls._get_facet_result(
-                    facet, result_row, cache, result
-                ).add_bucket(
-                    Bucket(
-                        value=value,
-                        count=result_row[-1]
-                    )
-                )
-        return result.facet_results
-
-    @classmethod
-    def _get_facet_result(cls, facet, result_row, cache, result):
-        key = facet.result_key(result_row)
-
-        if key not in cache.keys():
-            if facet.parent:
-                container = cls._get_facet_result(
-                    facet.parent, result_row, cache, result
-                ) \
-                .get_bucket(result_row[facet.parent.col_index])
-
-            else:
-                container = result
-
-            cache[key] = container.get_facet_result(facet.name)
-
-        return cache[key]
+        list.__init__(self, base_result)
+        FacetResultContainer.__init__(
+            self, raw_faceted_result, grouping_index
+        )

@@ -5,12 +5,10 @@ from sqlalchemy.orm import Query
 from sqlalchemy import func, distinct, tuple_, desc
 
 from .facet import Facet
-from .result import FacetedResult
+from .result import FacetedResult, FacetResultContainer
 from .utils import get_column, get_primary_key
 
 
-
-# noinspection PyDefaultArgument
 def setup_query_columns(facets, col_names=None, result=None):
     col_names, result = col_names or [], result or []
     for facet in facets:
@@ -24,7 +22,7 @@ def setup_query_columns(facets, col_names=None, result=None):
 
     return result
 
-# noinspection PyDefaultArgument
+
 def setup_grouping_index(facets, col_count: int, grouping_index=None,
                          sets=None):
     grouping_index, sets = grouping_index or dict(), sets or set()
@@ -40,6 +38,7 @@ def setup_grouping_index(facets, col_count: int, grouping_index=None,
         setup_grouping_index(facet.children, col_count, grouping_index, sets)
 
     return grouping_index, sets
+
 
 def sub_facets(facets):
     facets_by_name = OrderedDict()
@@ -118,13 +117,11 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
             .group_by(func.grouping_sets(*grouping_sets))\
             .order_by(desc(grouping_col))
 
-
     def facets(self):
-        return FacetedResult.build_result(
+        return FacetResultContainer(
             self.facets_query.all(),
             self._grouping_index
-        )
-
+        ).facets
 
     def all(self):
         return FacetedResult(

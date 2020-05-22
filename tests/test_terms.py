@@ -5,6 +5,7 @@ from .conftest import QUERIES
 
 from sqlalchemy_facets import FacetedQuery, TermsFacet, FacetResult, Bucket
 
+
 class FacetedBlog(FacetedQuery):
 
     category = TermsFacet()

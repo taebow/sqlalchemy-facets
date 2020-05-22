@@ -2,6 +2,7 @@ from abc import ABC
 from ..mapper import Mapper, IdentityMapper
 from ..utils import SQLAlchemyFacetsError
 
+
 class Facet(ABC):
 
     def __init__(self, *args, **kwargs):
@@ -11,6 +12,7 @@ class Facet(ABC):
         self.children = []
         self.parent = None
         self.grouping = []
+        self.col_index = None
 
         for arg in args:
             if isinstance(arg, str):
@@ -32,6 +34,7 @@ class Facet(ABC):
                     raise SQLAlchemyFacetsError(
                         f"Bad type for mapper '{str(v)}' ({type(v)})"
                     )
+
     @property
     def name(self):
         return self._name
@@ -51,16 +54,14 @@ class Facet(ABC):
             self.parent, "grouping", list()
         ) + [col_index]
 
-
     def grouping_key(self, col_count):
         return int(
             (2**col_count)*(1-sum([2**(-p-1) for p in self.grouping]))-1
         )
-
 
     def result_key(self, result_row: tuple):
         buckets_mask = (
             result_row[index]
             for index in getattr(self.parent, "grouping", ())
         )
-        return (result_row[-2], *buckets_mask)
+        return result_row[-2], *buckets_mask

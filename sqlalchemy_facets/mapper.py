@@ -1,10 +1,12 @@
 from abc import ABC
 
+
 class Mapper(dict, ABC):
 
     @property
     def reverse(self) -> dict:
         raise NotImplementedError
+
 
 class IdentityMapper(Mapper):
 
@@ -21,7 +23,6 @@ class IdentityMapper(Mapper):
     @property
     def reverse(self) -> dict:
         return self._reverse
-
 
     def __missing__(self, key):
         return key
