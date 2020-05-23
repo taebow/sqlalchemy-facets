@@ -66,7 +66,7 @@ class FacetedQueryMeta(type):
 
 class FacetedQuery(metaclass=FacetedQueryMeta):
 
-    def __init__(self, query: Query, parallel=None):
+    def __init__(self, query: Query):
         self.base = query.limit(None).offset(None)
 
     def __getattr__(self, item):
