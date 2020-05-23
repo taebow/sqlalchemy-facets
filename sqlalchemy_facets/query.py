@@ -107,13 +107,16 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
 
         grouping_col = func.grouping(*facet_columns).label("_grouping")
 
-        return self.session.query(
-                *[
-                    *facet_columns,
-                    grouping_col,
-                    func.count(distinct(count_column))
-                ]
-            )\
+        facets_query = self.session.query(
+            *facet_columns,
+            grouping_col,
+            func.count(distinct(count_column))
+        )
+
+        for facet in self._column_facets:
+            facet.apply_join(base, facets_query)
+
+        return facets_query \
             .group_by(func.grouping_sets(*grouping_sets))\
             .order_by(desc(grouping_col))
 

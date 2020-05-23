@@ -7,4 +7,4 @@ class TermsFacet(Facet):
         super().__init__(*args, **kwargs)
 
     def facet_column(self, base):
-        return getattr(base.c, self.column_name).label(self.column_name)
+        return getattr(base.c, self.column_name).label(self.name)

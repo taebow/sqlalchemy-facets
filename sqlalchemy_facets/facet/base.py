@@ -65,3 +65,6 @@ class Facet(ABC):
             for index in getattr(self.parent, "grouping", ())
         )
         return result_row[-2], *buckets_mask
+
+    def apply_join(self, base, facets_query):
+        return facets_query

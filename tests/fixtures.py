@@ -8,6 +8,7 @@ from .db import session, Base
 authors = [Faker("name").generate() for _ in range(3)]
 categories = ["system", "database", "api", None]
 
+
 class Author(Base):
     __tablename__ = "author"
     id = Column(Integer, primary_key=True)
@@ -27,7 +28,6 @@ class Post(Base):
     published = Column(Boolean, index=True)
     author = relationship(Author)
     can_be_null = Column(String, index=True)
-
 
 
 class PostFactory(SQLAlchemyModelFactory):
