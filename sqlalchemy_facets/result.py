@@ -18,13 +18,13 @@ class FacetResultContainer:
         cache = dict()
         for result_row in raw_faceted_result:
             for facet in grouping_index[result_row[-2]]:
-                bucket = Bucket(
-                    value=facet.mapper[result_row[facet.col_index]],
-                    count=result_row[-1]
-                )
-                self.get_facet_result(
-                    facet, result_row, cache
-                ).add_bucket(bucket)
+                bucket = facet.get_bucket(result_row)
+                if bucket is not None:
+                    self.get_facet_result(
+                        facet, result_row, cache
+                    ).add_bucket(
+                        bucket
+                    )
 
     def get_facet_result(self, facet, result_row, cache):
         key = facet.result_key(result_row)
@@ -44,14 +44,6 @@ class FacetResultContainer:
             cache[key] = container._facet_results[facet.name]
 
         return cache[key]
-
-
-class Bucket(FacetResultContainer):
-
-    def __init__(self, value: Any, count: int):
-        super().__init__()
-        self.value = value
-        self.count = count
 
 
 class FacetResult:

@@ -1,5 +1,7 @@
+from typing import Any
 from abc import ABC
 from ..mapper import Mapper, IdentityMapper
+from ..result import FacetResultContainer
 from ..utils import SQLAlchemyFacetsError
 
 
@@ -68,3 +70,17 @@ class Facet(ABC):
 
     def apply_join(self, base, facets_query):
         return facets_query
+
+    def get_bucket(self, result_row):
+        return Bucket(
+            value=self.mapper[result_row[self.col_index]],
+            count=result_row[-1]
+        )
+
+
+class Bucket(FacetResultContainer):
+
+    def __init__(self, value: Any, count: int):
+        super().__init__()
+        self.value = value
+        self.count = count

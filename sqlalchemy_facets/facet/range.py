@@ -42,6 +42,12 @@ class RangeFacet(Facet):
             )
         )
 
+    def get_bucket(self, result_row):
+        if result_row[self.col_index] is None:
+            return None
+        else:
+            return super().get_bucket(result_row)
+
 
 class Range:
 
