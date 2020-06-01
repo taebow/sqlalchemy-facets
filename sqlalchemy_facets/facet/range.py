@@ -1,4 +1,4 @@
-from sqlalchemy import select, literal, union, and_, or_
+from sqlalchemy import select, literal, union, and_, or_, alias
 from .base import Facet
 
 
@@ -21,7 +21,7 @@ class RangeFacet(Facet):
             and_(
                 getattr(base.c, self.column_name) >= self.subquery.c.low,
                 or_(
-                    getattr(base.c, self.column_name) <= self.subquery.c.high,
+                    getattr(base.c, self.column_name) < self.subquery.c.high,
                     self.subquery.c.high == None
                 )
             )
@@ -29,15 +29,17 @@ class RangeFacet(Facet):
 
     @staticmethod
     def build_subquery(ranges):
-        return union(
-            *[
-                select([
-                    literal(r.key).label("key"),
-                    literal(r.low).label("low"),
-                    literal(r.high).label("high")
-                ])
-                for r in ranges
-            ]
+        return alias(
+            union(
+                *[
+                    select([
+                        literal(r.key).label("key"),
+                        literal(r.low).label("low"),
+                        literal(r.high).label("high")
+                    ])
+                    for r in ranges
+                ]
+            )
         )
 
 

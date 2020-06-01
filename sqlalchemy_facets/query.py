@@ -114,7 +114,7 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
         )
 
         for facet in self._column_facets:
-            facet.apply_join(base, facets_query)
+            facets_query = facet.apply_join(base, facets_query)
 
         return facets_query \
             .group_by(func.grouping_sets(*grouping_sets))\
@@ -127,6 +127,7 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
         ).facets
 
     def all(self):
+        print(self.facets_query)
         return FacetedResult(
             base_result=self.base.all(),
             raw_faceted_result=self.facets_query.all(),
