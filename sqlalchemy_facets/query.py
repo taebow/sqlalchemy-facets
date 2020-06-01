@@ -127,7 +127,6 @@ class FacetedQuery(metaclass=FacetedQueryMeta):
         ).facets
 
     def all(self):
-        print(self.facets_query)
         return FacetedResult(
             base_result=self.base.all(),
             raw_faceted_result=self.facets_query.all(),
